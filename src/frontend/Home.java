@@ -4,8 +4,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 
 import com.jtattoo.plaf.mint.MintLookAndFeel;
 
@@ -43,6 +41,10 @@ public class Home extends JFrame {
 		}
 	}
 
+	public int getStatus() {
+		return this.status;
+	}
+
 	public void setStatus(int stts) {
 		this.status = stts;
 	}
@@ -71,46 +73,44 @@ public class Home extends JFrame {
 
 	private void addAction() {
 		pairButton.addActionListener(new ActionListener() {
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			new InputName(home, "双人", 0);
-			while (name1.length() * name2.length() == 0 && status == 1) {
-				new InputName(home, "双人", 1);
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				new InputName(home, "双人", 0);
+				while (name1.length() * name2.length() == 0 && status == 1) {
+					new InputName(home, "双人", 1);
+				}
+				if (name1.length() * name2.length() != 0) {
+					toRoom("双人");
+				} else {
+					setVisible(true);
+				}    
 			}
-			if (name1.length() * name2.length() != 0) {
-				toRoom("双人");
-			} else {
-				setVisible(true);
-			}    
-		}
 		});
 
 		robotButton.addActionListener(new ActionListener() {
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			new InputName(home, "人机", 0);
-			while (name1.length() == 0 && status == 1) {
-				new InputName(home, "人机", 1);
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				new InputName(home, "人机", 0);
+				while (name1.length() == 0 && status == 1) {
+					new InputName(home, "人机", 1);
+				}
+				if (name1.length() != 0) {
+					setName(1, "机器人");
+					toRoom("人机");
+				} else {
+					setVisible(true);
+				}
 			}
-			if (name1.length() != 0) {
-				setName(1, "机器人");
-				toRoom("人机");
-			} else {
-				setVisible(true);
-			}
-		}
-		});
-
-		addWindowListener(new WindowAdapter() {
-		@Override
-		public void windowClosing(WindowEvent e) {
-			System.out.println("EXIT");
-		}
 		});
 	}
 
 	public void toRoom(String mode) {
-		new Room(this, mode);
-		this.setVisible(false);
+		if (mode == "双人") {
+			new ScriptSelect(this, mode);
+			this.setVisible(false);
+		} else {
+			new Room(this, mode);
+			this.setVisible(false);
+		}
 	}
 }

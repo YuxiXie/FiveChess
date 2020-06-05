@@ -24,6 +24,10 @@ public class Room extends JFrame {
 		init(mode);
 	}
 
+	public int getRoomStatus() {
+		return home.getStatus();
+	}
+
 	public void updateRecord() {
 		recordPanel.removeAll();
 		recordPanel.repaint();
@@ -34,9 +38,9 @@ public class Room extends JFrame {
 		setLookAndFeel(30, 1);
 		JLabel name1 = new JLabel(this.home.name1);
 		JLabel name2 = new JLabel(this.home.name2);
-		name1.setBounds(125, 22, 100, 30);
+		name1.setBounds(125, 24, 100, 30);
 		recordPanel.add(name1);
-		name2.setBounds(500, 22, 100, 30);
+		name2.setBounds(500, 24, 100, 30);
 		recordPanel.add(name2);
 		JLabel win1 = new JLabel(String.valueOf(this.player1Win));
 		JLabel lose1 = new JLabel(String.valueOf(this.player1Lose));
@@ -74,7 +78,12 @@ public class Room extends JFrame {
 
 		JPanel panel = new JPanel() {
 			protected void paintComponent(Graphics g) {
-				Image image = new ImageIcon("images/room.png").getImage();
+				String imageFileName = "images/room_normal.png";
+				if (home.getStatus() == 2)
+					imageFileName = "images/room_forbid.png";
+				else if (mode == "人机")
+					imageFileName = "images/room_robot.png";
+				Image image = new ImageIcon(imageFileName).getImage();
 				g.drawImage(image, 0, 0, getWidth(), getHeight(), this);
 			}
 		};
@@ -91,7 +100,7 @@ public class Room extends JFrame {
 
 		setLookAndFeel(15, 0);
 		JPanel bttnPanel = new JPanel();
-		bttnPanel.setBounds(100, 725, 515, 50);
+		bttnPanel.setBounds(100, 725, 615, 50);
 		panel.add(bttnPanel);
 		bttnPanel.setLayout(null);
 		bttnPanel.setOpaque(false);
@@ -128,18 +137,44 @@ public class Room extends JFrame {
 			}
 		});
 		bttnPanel.add(regret);
+
+		if (home.getStatus() == 2) {
+			JButton forbid = new JButton("黑棋禁手");
+			forbid.setBounds(345, 10, 100, 26);
+			forbid.addMouseListener(new MouseAdapter() {
+				@Override
+				public void mouseClicked(MouseEvent e) {
+					setLookAndFeel(15, 0);
+					if (chessPanel.steps % 2 == 1) {
+						String[] options = {"确认", "摁错了"};
+						int res = JOptionPane.showOptionDialog(null, "请根据规则再次确认黑棋是否禁手", "黑白双方共同确认",
+															   JOptionPane.DEFAULT_OPTION, JOptionPane.YES_NO_OPTION,
+															   new ImageIcon("images/back.png"),
+															   options, options[0]);
+						if (res == 0) {
+							win(chessPanel.steps + 1);
+						}
+					}
+				}
+			});
+			bttnPanel.add(forbid);
+		} 
 		
 		JButton theExit = new JButton("退出");
-		theExit.setBounds(345, 10, 90, 26);
+		if (getRoomStatus() == 2)
+			theExit.setBounds(465, 10, 90, 26);
+		else
+			theExit.setBounds(345, 10, 90, 26);
 		theExit.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				chessPanel.getCore().newGame();
 				home.setName(0, "");
 				home.setName(1, "");
+				home.setStatus(0);
 				toRoomList();
 			}
-		});		
+		});
 		bttnPanel.add(theExit);
 	}
 
@@ -156,6 +191,31 @@ public class Room extends JFrame {
 		backGame = false;		
 	}
 
+	public Boolean checkRestart() {
+		Boolean flag = false;
+		
+		setLookAndFeel(15, 0);
+		String[] options = {"确认交换", "继续游戏"};
+		int res = JOptionPane.showOptionDialog(null, "请白方选择是否交换黑白", "白方主动权（黑方无条件接受）",
+											   JOptionPane.DEFAULT_OPTION, JOptionPane.YES_NO_OPTION,
+											   new ImageIcon("images/back.png"), 
+											   options, options[0]);
+		if (res == 0) {
+			int tmp_cnt = this.player1Lose;
+			this.player1Lose = this.player1Win;
+			this.player1Win = tmp_cnt;
+			String tmp = home.name1;
+			home.name1 = home.name2;
+			home.name2 = tmp;
+			updateRecord();
+			repaint();
+			backGame = false;
+			flag = true;
+		}
+
+		return flag;
+	}
+
 	public void win(int steps) {
 		if (steps % 2 == 1)
 			this.player1Win += 1;
@@ -163,7 +223,6 @@ public class Room extends JFrame {
 			this.player1Lose += 1;
 		this.roundCnt += 1;
 		setLookAndFeel(15, 0);
-		System.out.println(mode);
 		if (mode == "人机") {
 			JOptionPane.showMessageDialog(this, "恭喜 :)", "你赢了！", 
 				JOptionPane.ERROR_MESSAGE, new ImageIcon("images/result.png"));

@@ -71,7 +71,6 @@ public class ChessTable extends JPanel {
 	}
 
 	public synchronized void robotChess() {
-		System.out.println("机器线程开启");
 		synchronized (chessTable) {
 			while (true) {
 				if (!lock) {
@@ -86,11 +85,9 @@ public class ChessTable extends JPanel {
 					} catch (Exception e) {
 						e.printStackTrace();
 				}
-				int[] XY = core.computer(2);	//humanX, humanY
+				int[] XY = core.computer(2);
 				core.add(XY[0], XY[1], 2);
 				mark[XY[0]][XY[1]] = 2;
-				System.out.println(String.valueOf(XY[0]));
-				System.out.println(String.valueOf(XY[1]));
 				repaint();
 				steps += 1;
 				lock = false;
@@ -138,13 +135,15 @@ public class ChessTable extends JPanel {
 							mark[humanX][humanY] = 1;
 							lock = true;
 							repaint();
-							if(steps == 225) {
-								room.pingju(steps);
-							} else if(core.check(humanX, humanY, 2 - steps % 2)){
-								room.win(steps);
-							} else {
-								chessTable.notifyAll();
-							}	
+							if (room.getRoomStatus() == 2 || steps != 3 || !room.checkRestart()) {
+								if (steps == 225) {
+									room.pingju(steps);
+								} else if(core.check(humanX, humanY, 2 - steps % 2)){
+									room.win(steps);
+								} else {
+									chessTable.notifyAll();
+								}
+							}
 						}
 					}
 				}
@@ -196,22 +195,22 @@ public class ChessTable extends JPanel {
 					g2.setComposite(AlphaComposite.getInstance(
 						AlphaComposite.SRC_OVER, 0.5f));
 					
-					GradientPaint gp3 = new GradientPaint(
+					GradientPaint gp1 = new GradientPaint(
 						(float) ellipse.getMinX(),
 						(float) ellipse.getMinY(), Color.white,
 						(float) ellipse.getMaxX(),
 						(float) ellipse.getMaxY(), Color.gray);
 					
-					GradientPaint gp4 = new GradientPaint(
+					GradientPaint gp2 = new GradientPaint(
 						(float) ellipse.getMinX() - 1,
 						(float) ellipse.getMinY() - 1, Color.white,
 						(float) ellipse.getCenterX() - 1,
 						(float) ellipse.getCenterY() - 1, Color.black);
 					
 					if (core.chessboard[i][j] == 1) {
-						g2.setPaint(gp4);
+						g2.setPaint(gp2);
 					} else if (core.chessboard[i][j] == 2) {
-						g2.setPaint(gp3);
+						g2.setPaint(gp1);
 					}
 					
 					g2.setComposite(AlphaComposite.getInstance(
