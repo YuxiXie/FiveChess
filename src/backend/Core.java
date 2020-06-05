@@ -1,11 +1,7 @@
 package backend;
 
-import java.util.HashMap;
-
-
 public class Core {
     private static int row = 15, col = 15;
-    private HashMap<String, Integer> heuristic = new HashMap<String, Integer>();
     private int[] isMoved = new int[2]; // isMoved[0]: #black moves; isMoved[1]: #white moves
     private int[][][] latestMoves = new int[2][2][2];  // latestMoves[0][0]: latest black move; latestMoves[0][1]: second latest black move;
     private int[][] value = new int[row][col];
@@ -14,8 +10,16 @@ public class Core {
 
     
     public static void main(String[] args) {
+        Core testcore = new Core();
+        testcore.newGame();
+        testcore.resetValue();
+        testcore.chessboard[7][7] = 1;
+        int[] xy = testcore.computer(2);
+        System.out.println(xy[0]);
+        System.out.println(xy[1]);
         
     }
+
 
     public boolean add(int x, int y, int player){   // player: black: 1, white: 2
         if (chessboard[x][y] == 0 ){
@@ -151,17 +155,16 @@ public class Core {
                 }
             }
         }
+        this.resetValue();
     }
 
     public int[] computer(int computerColor){
-        this.setHeuristic();
+        this.resetValue();
 
         for (int i = 0; i < 15; i++) {
             for (int j = 0; j < 15; j++) {
                 if (chessboard[i][j] == 0) {    // check unoccupied spots
                     String pattern = "";
-                    int color = 0;
-
                     // downwards
                     for (int k = i + 1; k < 15; k++) {   
                         if (chessboard[k][j] == 0) break;
@@ -172,7 +175,7 @@ public class Core {
                             else pattern += "2";
                         }
                     }
-                    if (heuristic.get(pattern) != null) value[i][j] += heuristic.get(pattern);
+                    value[i][j] += getHeuristic(pattern);
 
                     // upwards
                     pattern = "";
@@ -185,7 +188,7 @@ public class Core {
                             else pattern += "2";
                         }
                     }
-                    if (heuristic.get(pattern) != null) value[i][j] += heuristic.get(pattern);
+                    value[i][j] += getHeuristic(pattern);
 
                     // rightwards
                     pattern = "";
@@ -198,7 +201,7 @@ public class Core {
                             else pattern += "2";
                         }
                     }
-                    if (heuristic.get(pattern) != null) value[i][j] += heuristic.get(pattern);
+                    value[i][j] += getHeuristic(pattern);
 
                     // leftwards
                     pattern = "";
@@ -211,7 +214,7 @@ public class Core {
                             else pattern += "2";
                         }
                     }
-                    if (heuristic.get(pattern) != null) value[i][j] += heuristic.get(pattern);
+                    value[i][j] += getHeuristic(pattern);
 
                     // lowerright
                     pattern = "";
@@ -224,7 +227,7 @@ public class Core {
                             else pattern += "2";
                         }
                     }
-                    if (heuristic.get(pattern) != null) value[i][j] += heuristic.get(pattern);
+                    value[i][j] += getHeuristic(pattern);
 
                     // upperleft
                     pattern = "";
@@ -237,7 +240,7 @@ public class Core {
                             else pattern += "2";
                         }
                     }
-                    if (heuristic.get(pattern) != null) value[i][j] += heuristic.get(pattern);
+                    value[i][j] += getHeuristic(pattern);
 
                     // upperright
                     pattern = "";
@@ -250,7 +253,7 @@ public class Core {
                             else pattern += "2";
                         }
                     }
-                    if (heuristic.get(pattern) != null) value[i][j] += heuristic.get(pattern);
+                    value[i][j] += getHeuristic(pattern);
 
                     // lowerleft
                     pattern = "";
@@ -263,7 +266,7 @@ public class Core {
                             else pattern += "2";
                         }
                     }
-                    if (heuristic.get(pattern) != null) value[i][j] += heuristic.get(pattern);
+                    value[i][j] += getHeuristic(pattern);
                 }
                 else value[i][j] = 0;
             }
@@ -275,9 +278,9 @@ public class Core {
         for (int i = 0; i < 15; i++) {
             for (int j = 0; j < 15; j++) {
                 if (maxValue < value[i][j]) {
-                    maxValue = value[i][j];
                     finalMove[0] = i;
                     finalMove[1] = j;
+                    maxValue = value[i][j];
                 }
             }
         }
@@ -285,15 +288,23 @@ public class Core {
         return finalMove;
     }
 
-    public void setHeuristic(){
-        heuristic.put("1", 20);
-        heuristic.put("11", 200);
-        heuristic.put("111", 2000);
-        heuristic.put("1111", 3000);
-        heuristic.put("12", 10);
-        heuristic.put("112", 100);
-        heuristic.put("1112", 1000);
-        heuristic.put("11112", 2000);
+
+    public int getHeuristic(String pattern){
+        if (pattern.startsWith("1111")) return 5000;
+        else if (pattern.startsWith("2222")) return 4000;
+        else if (pattern.startsWith("1112")) return 1000;
+        else if (pattern.startsWith("111")) return 3000;
+        else if (pattern.startsWith("2221")) return 800;
+        else if (pattern.startsWith("222")) return 3500;
+        else if (pattern.startsWith("112")) return 600;
+        else if (pattern.startsWith("11")) return 2000;
+        else if (pattern.startsWith("221")) return 400;
+        else if (pattern.startsWith("22")) return 800;
+        else if (pattern.startsWith("1")) return 200;
+        else if (pattern.startsWith("12")) return 100;
+        else if (pattern.startsWith("2")) return 300;
+        else if (pattern.startsWith("21")) return 150;
+        else return 0;
     }
 
     public void resetValue(){
