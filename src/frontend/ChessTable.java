@@ -93,7 +93,7 @@ public class ChessTable extends JPanel {
 				lock = false;
 				if(steps == 225)
 					room.pingju(steps);
-				else if(core.check(XY[0], XY[1], 2 - steps % 2)){
+				else if(core.check(XY[0], XY[1], 2 - steps % 2) > 0){
 					room.deafeat(steps);
 				} else
 					chessTable.notifyAll();
@@ -122,7 +122,7 @@ public class ChessTable extends JPanel {
 							if(steps == 225) {
 								room.pingju(steps);
 							}
-							else if(core.check(humanX, humanY, 2 - steps % 2)){
+							else if(core.check(humanX, humanY, 2 - steps % 2) > 0){
 								room.win(steps);
 							} else {
 								chessTable.notifyAll();
@@ -136,10 +136,17 @@ public class ChessTable extends JPanel {
 							lock = true;
 							repaint();
 							if (room.getRoomStatus() == 2 || steps != 3 || !room.checkRestart()) {
-								if (steps == 225) {
+								if (room.obviousForbid) {
+									room.win(steps - 1);
+								} else if (steps == 225) {
 									room.pingju(steps);
-								} else if(core.check(humanX, humanY, 2 - steps % 2)){
+								} else if(core.check(humanX, humanY, 2 - steps % 2) > 0 && (room.getRoomStatus() == 3 || steps % 2 == 0)) {
 									room.win(steps);
+								} else if (core.check(humanX, humanY, 2 - steps % 2) == 1) {
+									room.win(steps);
+								} else if (core.check(humanX, humanY, 2 - steps % 2) == 2 && steps % 2 == 1) {
+									room.obviousForbid = true;
+									chessTable.notifyAll();
 								} else {
 									chessTable.notifyAll();
 								}

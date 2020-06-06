@@ -69,76 +69,80 @@ public class Core {
         }
     }
 
-    public boolean check(int x, int y, int player){  // check after player moves at (x,y)
+    public int check(int x, int y, int player){  // check after player moves at (x,y)
         int count = 1;
         // horizontal
         for (int i = x - 1; i >= 0; i--) {
             if (chessboard[i][y] == player){
                 count = count + 1; 
-                if (count >= 5) return true;
+                if (count > 5) return 2;
             } 
             else break;
         }
         for (int i = x + 1; i < 15; i++) {
             if (chessboard[i][y] == player) {
                 count = count + 1;
-                if (count >= 5) return true;
+                if (count > 5) return 2;
             }
             else break;
         }
+        if (count == 5) return 1;
 
         // vertical
         count = 1;
         for (int i = y - 1; i >= 0; i--) {
             if (chessboard[x][i] == player){
                 count = count + 1; 
-                if (count >= 5) return true;
+                if (count > 5) return 2;
             } 
             else break;
         }
         for (int i = y + 1; i < 15; i++) {
             if (chessboard[x][i] == player) {
                 count = count + 1;
-                if (count >= 5) return true;
+                if (count > 5) return 2;
             }
             else break;
         }
+        if (count == 5) return 1;
 
         // "\"
         count = 1;
         for (int i = x - 1, j = y - 1; i >= 0 && j >= 0; i--, j--) {
             if (chessboard[i][j] == player){
                 count = count + 1; 
-                if (count >= 5) return true;
+                if (count > 5) return 2;
             } 
             else break;
         }
         for (int i = x + 1, j = y + 1; i < 15 && j < 15; i++, j++) {
             if (chessboard[i][j] == player) {
                 count = count + 1;
-                if (count >= 5) return true;
+                if (count > 5) return 2;
             }
             else break;
         }
+        if (count == 5) return 1;
 
         // "/"
         count = 1;
         for (int i = x - 1, j = y + 1; i >= 0 && j < 15; i--, j++) {
             if (chessboard[i][j] == player){
                 count = count + 1; 
-                if (count >= 5) return true;
+                if (count > 5) return 2;
             } 
             else break;
         }
         for (int i = x + 1, j = y - 1; i < 15 && j >= 0; i++, j--) {
             if (chessboard[i][j] == player) {
                 count = count + 1;
-                if (count >= 5) return true;
+                if (count > 5) return 2;
             }
             else break;
         }
+        if (count == 5) return 1;
 
-        return false;
+        return 0;
     }
 
     public void newGame(){

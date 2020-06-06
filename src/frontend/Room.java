@@ -17,6 +17,9 @@ public class Room extends JFrame {
 	private int player1Win = 0;
 	private int player1Lose = 0;
 	private int roundCnt = 0;
+	private boolean pointForbid = false;
+
+	public boolean obviousForbid = false;
 
 	public Room(Home home, String mode) {
 		this.home = home;
@@ -38,9 +41,9 @@ public class Room extends JFrame {
 		setLookAndFeel(30, 1);
 		JLabel name1 = new JLabel(this.home.name1);
 		JLabel name2 = new JLabel(this.home.name2);
-		name1.setBounds(125, 24, 100, 30);
+		name1.setBounds(125, 24, 200, 30);
 		recordPanel.add(name1);
-		name2.setBounds(500, 24, 100, 30);
+		name2.setBounds(500, 24, 200, 30);
 		recordPanel.add(name2);
 		JLabel win1 = new JLabel(String.valueOf(this.player1Win));
 		JLabel lose1 = new JLabel(String.valueOf(this.player1Lose));
@@ -125,8 +128,14 @@ public class Room extends JFrame {
 			public void mouseClicked(MouseEvent e) {
 				setLookAndFeel(15, 0);
 				if (backGame == true) {
+					String object = "";
+					if (mode == "双人") {
+						object = "黑方";
+						if (chessPanel.steps % 2 == 0) 
+							object = "白方";
+					}
 					String[] options = {"确认", "取消"};
-					int res = JOptionPane.showOptionDialog(null, "确认要悔棋吗？", "三思而后行",
+					int res = JOptionPane.showOptionDialog(null, object + "确认要悔棋吗？", "三思而后行",
 														   JOptionPane.DEFAULT_OPTION, JOptionPane.YES_NO_OPTION,
 														   new ImageIcon("images/back.png"), 
 														   options, options[0]);
@@ -152,6 +161,7 @@ public class Room extends JFrame {
 															   new ImageIcon("images/back.png"),
 															   options, options[0]);
 						if (res == 0) {
+							pointForbid = true;
 							win(chessPanel.steps + 1);
 						}
 					}
@@ -188,7 +198,9 @@ public class Room extends JFrame {
 		updateRecord();
 		repaint();
 		chessPanel.steps = 0;
-		backGame = false;		
+		backGame = false;
+		obviousForbid = false;
+		pointForbid = false;		
 	}
 
 	public Boolean checkRestart() {
@@ -223,15 +235,20 @@ public class Room extends JFrame {
 			this.player1Lose += 1;
 		this.roundCnt += 1;
 		setLookAndFeel(15, 0);
+		String forbidTip = "胜败乃兵家常事";
+		if (obviousForbid && steps % 2 == 1)
+			forbidTip = "白方没有指出黑棋禁手（长连）！";
+		else if (pointForbid && steps % 2 == 0)
+		    forbidTip = "黑棋禁手！";
 		if (mode == "人机") {
 			JOptionPane.showMessageDialog(this, "恭喜 :)", "你赢了！", 
 				JOptionPane.ERROR_MESSAGE, new ImageIcon("images/result.png"));
 		} else {
 			if (steps % 2 == 0) {
-				JOptionPane.showMessageDialog(this, "胜败乃兵家常事", "白方赢了，黑方输了！", 
+				JOptionPane.showMessageDialog(this, forbidTip, "白方赢了，黑方输了！", 
 					JOptionPane.ERROR_MESSAGE, new ImageIcon("images/result.png"));
 			} else {
-				JOptionPane.showMessageDialog(this, "胜败乃兵家常事", "黑方赢了，白方输了！", 
+				JOptionPane.showMessageDialog(this, forbidTip, "黑方赢了，白方输了！", 
 					JOptionPane.ERROR_MESSAGE, new ImageIcon("images/result.png"));
 			}
 		}		
