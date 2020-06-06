@@ -1,6 +1,17 @@
 # FiveChess
 
-simple implementation of the game FiveChess
+This is a simple implementation of the game FiveChess, based on the codes architecture from [the game repository](https://github.com/vencc/game), and further developed by [Yuxi XIE](https://github.com/YuxiXie) and [Jingyi LIU](https://github.com/Jingyi-Liu).
+
+## Run to Start Game
+
+```shell
+git clone https://github.com/YuxiXie/FiveChess.git
+cd FiveChess
+```
+
+and then just run from the `src/frontend.Main`.
+
+## Function Introduction
 
 #### Home Page
 
