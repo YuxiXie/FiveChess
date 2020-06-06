@@ -115,6 +115,10 @@ public class Room extends JFrame {
 				chessPanel.getCore().newGame();
 				repaint();
 				backGame = false;
+				chessPanel.steps = 0;
+				backGame = false;
+				obviousForbid = false;
+				pointForbid = false;
 			}
 		});
 		refresh.setBounds(115, 10, 100, 26);
